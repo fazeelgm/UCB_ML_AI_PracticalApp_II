@@ -124,6 +124,23 @@ def get_cleansed_data(infile='data/vehicles.csv'):
     cleansed = cleansed.drop(columns=drop_cols)
     after = cleansed.shape
     print('Done: {} -> {}'.format(before, after))
+
+    # Handle data type changes
+    print('\nData Transformations:')
+    fl_to_int_cols = ['year', 'odometer']
+    for col in fl_to_int_cols:
+        print('... {} float -> int: '.format(col), end='')
+        cleansed[col] = cleansed[col].astype(int)
+        print('Done')
+
+    # Make columnt cagtegorical 
+    print('\nCategory Transformations:')
+    obj_to_cat_cols = ['condition', 'manufacturer', 'cylinders', 'fuel', 
+                       'title_status', 'state', 'transmission', 'drive', 'size', 'type', 'paint_color']
+    for col in obj_to_cat_cols:
+        print('... Converting column "{}" -> Category: '.format(col), end='')
+        cleansed[col] = cleansed[col].astype('category')
+        print('Done')
     
     print('\nReturned Raw({:,d}x{}) and Cleansed({:,d}x{}) data'.format(raw.shape[0], raw.shape[1], 
                                                                         cleansed.shape[0], cleansed.shape[1]))
@@ -133,4 +150,5 @@ def get_cleansed_data(infile='data/vehicles.csv'):
     return raw, cleansed
 
 # r, c = get_cleansed_data()
-# print('raw[{}], cleansed[{}]'.format(r.shape, c.shape))
+# print('raw[{}], cleansed[{}]\n\n'.format(r.shape, c.shape))
+# c.info()
