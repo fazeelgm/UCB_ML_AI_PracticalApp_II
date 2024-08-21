@@ -69,6 +69,22 @@ def value_counts_2df(df1, df2, df1_label, df2_label, column, dropna=True):
 
     return result
 
+def format_floats(value):
+    """
+    :param value: Value to format as float
+    :returns: Returns the formatted float
+    """
+    return f'{value:,.4f}'
+
+def df_style_floats(df):
+    """
+    :param df: In-place replacement of the float columns to {:,.4f} format
+    :return: Returns the same DF back
+    """
+    styled_df = df
+    float_cols = df.select_dtypes(include='float').columns
+    styled_df[float_cols] = styled_df[float_cols].map(format_floats)
+    return styled_df
 
 def get_cleansed_data(infile='data/vehicles.csv'):
     """
