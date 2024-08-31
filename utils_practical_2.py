@@ -74,7 +74,7 @@ def format_floats(value):
     :param value: Value to format as float
     :returns: Returns the formatted float
     """
-    return f'{value:,.4f}'
+    return f'{value:,.5f}'
 
 def df_style_floats(df):
     """
