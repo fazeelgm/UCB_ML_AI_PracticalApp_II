@@ -132,7 +132,7 @@ def get_cleansed_data(infile='data/vehicles.csv'):
     print('Done: {} -> {}'.format(before_t, cleansed.shape))
 
     # handle columns to be dropped
-    drop_cols = ['mod_zscore', 'id', 'model']
+    drop_cols = ['mod_zscore', 'id', 'model', 'VIN']
     before = cleansed.shape
     print('\nDropping columns: ' + str(drop_cols))
     for col in drop_cols:
