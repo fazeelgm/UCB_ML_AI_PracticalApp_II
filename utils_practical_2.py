@@ -86,10 +86,11 @@ def df_style_floats(df):
     styled_df[float_cols] = styled_df[float_cols].map(format_floats)
     return styled_df
 
-def get_cleansed_data(infile='data/vehicles.csv'):
+def get_cleansed_data(cleanse_data=False, infile='data/vehicles.csv'):
     """
+    :param cleanse_data: If True, will cleanse the data based on the decisions made during the DataInvestigation
     :param infile: CSV input file, defaults to 'data/vehicles.csv'
-    :return: Returns raw_data_frame and cleansed_data_frame after applying the data cleansing findings of this assignment
+    :return: Returns raw_data_frame and cleansed_data_frame (cleanse_data=True) after applying the data cleansing findings of this assignment
     """
 
     raw = pd.DataFrame()
@@ -100,6 +101,9 @@ def get_cleansed_data(infile='data/vehicles.csv'):
     raw = pd.read_csv(infile)
     print('Done: {}'.format(raw.shape))
 
+    if not cleanse_data:
+        return raw
+    
     # make a copy of raw data and start to cleanse it
     cleansed = raw.copy()
 
