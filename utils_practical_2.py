@@ -114,7 +114,7 @@ def get_cleansed_data(cleanse_data=False, infile='data/vehicles.csv'):
     cleansed = remove_outliers_modz(raw, indent_output=True)
     print('... Removed {:,d} outliers'.format(before[0] - cleansed.shape[0]))
     before = cleansed.shape
-    print('... Removing cars with price = 0 ... ', end='')
+    print('... Removing cars with price <= 0 ... ', end='')
     cleansed = cleansed.query('price > 0')
     print(' Removed {:,d} rows'.format(before[0] - cleansed.shape[0]))
     after = cleansed.shape
