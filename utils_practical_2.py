@@ -69,6 +69,7 @@ def value_counts_2df(df1, df2, df1_label, df2_label, column, dropna=True):
 
     return result
 
+
 def format_floats(value):
     """
     :param value: Value to format as float
@@ -85,6 +86,53 @@ def df_style_floats(df):
     float_cols = df.select_dtypes(include='float').columns
     styled_df[float_cols] = styled_df[float_cols].map(format_floats)
     return styled_df
+
+
+# Evaluate models
+import logging
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+def get_model_metrics_as_results(name, clf, scaler, X_test, y_test, override_rmse=0):
+    """
+    Build standardized results row given the predictions and y_test values
+
+    :param name: Model name for labeling the row in the table
+    :param clf: Fitted classifier to get metrics
+    :param scaler: Fitted scaler used for transformation
+    :param X_test: Test data used to fit the classifier
+    :param y_test: Evaluation data to be used for the metrics
+    :param override_rmse: Default 0 will internally calculate RMSE as np.sqrt(MSE), pass in a 
+        value for cross-validated estimator result if needed
+    :return: Returns single row of results summary table containing:
+    
+        [model_name, MAE, MSE, RMSE, R2_Score, y-intercept]
+    """
+    global logging
+    logging.debug(f'Working on {name}')
+
+    # Get predictions
+    y_preds = clf.predict(X_test)
+
+    # get metrics
+    mae = mean_absolute_error(y_preds, y_test)
+    mse = mean_squared_error(y_preds, y_test)
+    if override_rmse == 0:
+        rmse = np.sqrt(mse)
+    else:
+        rmse=override_rmse
+    r2 = r2_score(y_test, y_preds)
+    score = clf.score(X_test, y_test)
+    if (name == 'DummyRegressor'):
+        y_intercept = 0
+    else:
+        y_intercept = np.abs(clf.intercept_)
+    sname = scaler.__class__.__name__
+    
+    logging.debug(f'... {name}: Scaler: {sname} MAE: {mae:,.4f}, MSE: {mse:,.4f}, RMSE: {rmse:,.4f}, Override RMSE: {override_rmse:,.4f}, R2: {r2:,.4f}, Score: {score:,.4f}, y-int: {y_intercept:,.4f}')
+
+    return [name, sname, mae, mse, rmse, score, y_intercept]
+
+
 
 def get_cleansed_data(cleanse_data=False, infile='data/vehicles.csv'):
     """
