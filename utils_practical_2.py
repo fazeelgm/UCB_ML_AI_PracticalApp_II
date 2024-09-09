@@ -7,6 +7,22 @@ import pandas as pd
 import numpy as np
 import time
 
+import matplotlib.pyplot as plt
+
+# Export dataFrame's as images
+import dataframe_image as dfi
+
+# Global rules
+
+global logging
+
+# Page width to use for wide figures - make it consistent across the project
+page_width=10
+
+# Clean up axes labels
+axes_fonts = {'fontweight': 'bold'}
+title_fonts = {'fontweight': 'bold', 'fontsize': 14}
+
 
 # Calculate Mod-Z score
 # Converted to a funciton so I can call it from get_cleansed_data() to refresh the data repeatedly
@@ -107,7 +123,6 @@ def get_model_metrics_as_results(name, clf, scaler, X_test, y_test, override_rms
     
         [model_name, MAE, MSE, RMSE, R2_Score, y-intercept]
     """
-    global logging
     logging.debug(f'Working on {name}')
 
     # Get predictions
@@ -131,6 +146,112 @@ def get_model_metrics_as_results(name, clf, scaler, X_test, y_test, override_rms
     logging.debug(f'... {name}: Scaler: {sname} MAE: {mae:,.4f}, MSE: {mse:,.4f}, RMSE: {rmse:,.4f}, Override RMSE: {override_rmse:,.4f}, R2: {r2:,.4f}, Score: {score:,.4f}, y-int: {y_intercept:,.4f}')
 
     return [name, sname, mae, mse, rmse, score, y_intercept]
+
+
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+def fit_plot_segments(segment_dict, results_seg, model=None, scaler=None, random_state=42, filename=False):
+    """
+    Predict and plot prices for selected segment
+
+    :param segment_dict: Dictionary containg segment data and plot information
+    :param results_seg: Array to append to for tabulating results
+    :param model: Model to use for training
+    :param scaler: Scaler to transform data
+    :param random_state: Random state for modeling
+    :param filename: Optional filename to save the plot
+    :returns: Returns the results table that was passed in
+    """
+
+    # global logging
+    # logging.getLogger().setLevel(logging.DEBUG)
+
+    if model is None:
+        logging.debug('No model passed in - nothing to do!')
+        
+    plt.figure(figsize=(page_width,6))
+    # plt.figure(figsize=(8,8))
+    
+    results_seg = []
+    for segment in segment_dict['seg_data']:
+        logging.debug(f"Segment: {segment}, #Samples: {len(segment_dict['seg_data'][segment])}")
+    
+        if len(segment_dict['seg_data'][segment]) <= 0:
+            return results_seg
+        
+        # Predict on the segment
+        X = segment_dict['seg_data'][segment].drop('price', axis='columns')
+        y = segment_dict['seg_data'][segment]['price']
+        logging.debug(f'X: {X.shape} y: {y.shape}')
+    
+        # transform the data: OneHotEncoding
+        X = pd.get_dummies(X, drop_first=True)
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_state)
+        logging.debug(f'X_train: {X_train.shape} X_test: {X_test.shape} y_train: {y_train.shape} y_test: {y_test.shape}')
+    
+        # Scale the data
+        if scaler is not None:
+            X_train_scaled = scaler.fit_transform(X_train)
+            X_test_scaled = scaler.fit_transform(X_test)
+            logging.debug(f'X_scaled: {X_train_scaled.shape} X_test_scaled: {X_test_scaled.shape}')
+    
+        model.fit(X_train_scaled, y_train)
+        
+        # Plot predictions
+        y_preds = model.predict(X_test_scaled)
+        score = model.score(X_test_scaled, y_test)
+        r2 = r2_score(y_test, y_preds)
+        y_intercept = model.intercept_
+        logging.debug(f'Score: {score}, r2: {r2}, y_int: {y_intercept}')
+        y_preds = y_preds + y_intercept
+    
+        # results_seg[segment_name, #samples, R2, y-intercept, mean-price]
+        results_seg.append([segment, len(segment_dict['seg_data'][segment]), r2*100, y_intercept, y_preds.mean()])
+    
+        perfect_pt_1 = [min(y_test), max(y_test)]
+        # perfect_pt_2 = [min(y_test), max(y_test)]
+        perfect_pt_2 = [min(y_test), max(y_test)] + y_intercept
+        plt.scatter(x=y_test, y=y_preds, label=f'{segment} / ${y_intercept:,.2f}', alpha=0.5)
+        plt.plot(perfect_pt_1, perfect_pt_2, linestyle='--', color='red')
+    
+    plt.xlabel(segment_dict['graph_x_label'], fontdict=axes_fonts)
+    plt.ylabel(segment_dict['graph_y_label'], fontdict=axes_fonts)
+    plt.title(segment_dict['graph_title'], fontdict=title_fonts)
+    plt.legend().set_title('Price Segment: / Base Price')
+    plt.tight_layout()
+
+    if (filename):
+        plt.savefig(filename)
+        
+    plt.show()
+
+    # logging.getLogger().setLevel(logging.INFO)
+    
+    return results_seg
+
+
+def generate_segments_table(segment_name, results_seg, png_filename=False):
+    """
+    Generate results table for the selected data segment
+
+    :param segment_name: Segment name to use in Model Description
+    :param results_seg: Results array that will be appropriately converted to a DataFrame
+    :param png_filename: Optional filename to save the results DF
+    :returns: Returns the styled DF
+    """
+    results_seg_df = pd.DataFrame(results_seg,
+                                  columns=[segment_name, '# Cars', 'R2 Score', 'Base Price', 'Avg Price'])
+    results_seg_df.set_index(results_seg_df.columns[0], inplace=True)
+    
+    # Export results for README
+    results_seg_df_styled = df_style_floats(results_seg_df)
+    
+    if (png_filename):
+        dfi.export(results_seg_df_styled, png_filename)
+
+    return results_seg_df_styled
 
 
 
