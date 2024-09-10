@@ -132,3 +132,80 @@ We can also make the following observations:
 * Each training feature contributes to the predicted price based on the weights for that specific feature that the model has learned from the training data - we will investigate this further later
 
 **_We will use the best performing Ridge model as the basis of our evaluation from this point forward_**.
+
+### Visualizing Actual vs Predicted Prices
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/scatter-optimized-preds-v-test.png" border="0"/>
+</td></tr></table>
+
+The red line represents the ideal case if all our predictions perfectly matched the actual prices. From the scatter plot above, we can see that our model has learnt the basic pricing relationship from our features but is not performing well on the top and bottom of the price range.
+
+### PredictionErrorDisplay: Residuals Comparison
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/optimized-PredictionErrorDisplay.png" border="0"/>
+</td></tr></table>
+
+The graph on the left is showing us that for the high-end, the prediction error increases from the perfect center line. Ideally, the scatter points would hug the diagonal. The graph on the right shows us the residuals, the difference between the actual and the predicted value, and shows us that the model is performing better in the middle price ranges. 
+
+Taken together, this shows us that we should perhaps use non-linear regresssion methods for this dataset to capture the variation on each end of the price spectrum. However, for the purpose of this study, we're deliberately restricting ourselves to linear regression models to learn more about them.
+
+## Interpreting the Best Model Results: Feature & Permutation Importance
+
+We now **Feature Importance** to interpret the results of the best performing model and analyze the coefficients, or weightings, for each feature that were _learnt_ by our model during the training process. This represents the causal relationship between that feature and the price of the vehicle, or the importance of that feature to the price prediction. 
+
+In addition, we also calculate the **Permutation Importance** to measure the change in our model's performace when a feature value is randomly shuffled to see how much the model relies on that feature for its predictions. This will help us determine collinearity between features not captured by the model cofficients and evaluate the impact of changing the feature on the model performance.
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/feature_perm_importance.png" border="0"/>
+</td></tr></table>
+
+## Feature Elimination & Optimization
+
+From the feature importance provided by the trained model on the left, we can see the top features that capture upto 85% of the price variation, and individually represent the impact to price when there is a one-unit change in the corresponding feature. For example, our model is aware of the different `condition` values when predicting prices, with `condition_fair` negatively impacting price and `condition_new` positively impacting price.
+
+Based on the above side-by-side comparison of the feature and permutation importance, we can see that a majority of the price is determeined by a relatively few features. Taking a look at the features that drive 85% of the price variance, the following features stand out, with different values impacting the price:
+
+* Odometer
+* Year
+* Condition
+* Transmission
+* Type
+* Drive
+* Fuel
+* Cylinders
+
+Based on the permutation importance, `year` pops to the top of the list. These results are intuitive and make sense from what we consider to be important considerations when pricing a used car.
+
+The other features can be eliminated as they are mostly colinear and detract from the accuracy score.
+
+Interestingly:
+
+* `title_status` was eliminated likely due to the vast majority of the cars having a 'clean' title
+* `size` is likely being over-shadowed by `transmission` and `cylinders` due to colinearity
+
+Let's run the best model again after removing the unnecessary features: `title_status`, `size`.
+
+I also decided to set the following cutoffs to get a more realistic inventory for re-trainig our best model:
+
+* Odometer: Restricted to milage between 0 and 250,000 miles
+  * Removed 232 low milage cars (0.19% of total) and 5,554 high-milage cars (4.53% of total)
+* Year: Removed 2,973 cars (2.42% of total) older than the 1980 model year
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/year_odo_distribution.png" border="0"/>
+</td></tr></table>
+
+Now, we're ready to re-train the model and analyze the results.
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/scatter-segments-opt-preds-v-test.png" border="0"/>
+</td></tr></table>
+
+RESULTS: Optimized Features: Predictions vs Actuals
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/results_opt_segments.png" border="0"/>
+</td></tr></table>
+
+
