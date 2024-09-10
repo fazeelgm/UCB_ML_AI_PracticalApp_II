@@ -213,13 +213,13 @@ def fit_plot_segments(segment_dict, results_seg, model=None, scaler=None, random
         perfect_pt_1 = [min(y_test), max(y_test)]
         # perfect_pt_2 = [min(y_test), max(y_test)]
         perfect_pt_2 = [min(y_test), max(y_test)] + y_intercept
-        plt.scatter(x=y_test, y=y_preds, label=f'{segment} / ${y_intercept:,.2f}', alpha=0.5)
+        plt.scatter(x=y_test, y=y_preds, label=f'{segment}: ${y_intercept:,.2f}', alpha=0.5)
         plt.plot(perfect_pt_1, perfect_pt_2, linestyle='--', color='red')
     
     plt.xlabel(segment_dict['graph_x_label'], fontdict=axes_fonts)
     plt.ylabel(segment_dict['graph_y_label'], fontdict=axes_fonts)
     plt.title(segment_dict['graph_title'], fontdict=title_fonts)
-    plt.legend().set_title('Price Segment: / Base Price')
+    plt.legend().set_title('Price Segment: Base Price')
     plt.tight_layout()
 
     if (filename):
