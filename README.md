@@ -151,7 +151,7 @@ The graph on the left is showing us that for the high-end, the prediction error 
 
 Taken together, this shows us that we should perhaps use non-linear regresssion methods for this dataset to capture the variation on each end of the price spectrum. However, for the purpose of this study, we're deliberately restricting ourselves to linear regression models to learn more about them.
 
-## Interpreting the Best Model Results: Feature & Permutation Importance
+### Interpreting the Best Model Results: Feature & Permutation Importance
 
 We now use **Feature Importance** to interpret the results of the best performing model and analyze the coefficients, or weightings, for each feature that were _learnt_ by our model during the training process. This represents the causal relationship between that feature and the price of the vehicle, or the importance of that feature to the price prediction. 
 
@@ -166,7 +166,7 @@ In addition, we also calculate the **Permutation Importance** to measure the cha
   <img src="images/feature_perm_importance.png" border="0"/>
 </td></tr></table>
 
-## Feature Elimination & Optimization
+### Feature Elimination & Optimization
 
 From the feature importance provided by the trained model on the left, we can see the top features that capture upto 85% of the price variation, and individually represent the impact to price when there is a one-unit change in the corresponding feature. For example, our model is aware of the different `condition` values when predicting prices, with `condition_fair` negatively impacting price and `condition_new` positively impacting price.
 
