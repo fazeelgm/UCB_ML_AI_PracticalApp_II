@@ -153,9 +153,14 @@ Taken together, this shows us that we should perhaps use non-linear regresssion 
 
 ## Interpreting the Best Model Results: Feature & Permutation Importance
 
-We now **Feature Importance** to interpret the results of the best performing model and analyze the coefficients, or weightings, for each feature that were _learnt_ by our model during the training process. This represents the causal relationship between that feature and the price of the vehicle, or the importance of that feature to the price prediction. 
+We now use **Feature Importance** to interpret the results of the best performing model and analyze the coefficients, or weightings, for each feature that were _learnt_ by our model during the training process. This represents the causal relationship between that feature and the price of the vehicle, or the importance of that feature to the price prediction. 
 
 In addition, we also calculate the **Permutation Importance** to measure the change in our model's performace when a feature value is randomly shuffled to see how much the model relies on that feature for its predictions. This will help us determine collinearity between features not captured by the model cofficients and evaluate the impact of changing the feature on the model performance.
+
+<table style="width:100%"><tr>
+  <td width="500%"><img src="images/results_feature_imp.png" border="0"/></td>
+  <td width="500%"><img src="images/results_permutation_imp.png" border="0"/></td>
+</tr></table>
 
 <table style="width:100%" align="center"><tr ><td width="100%">
   <img src="images/feature_perm_importance.png" border="0"/>
