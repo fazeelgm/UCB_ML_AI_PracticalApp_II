@@ -203,9 +203,54 @@ Now, we're ready to re-train the model and analyze the results.
   <img src="images/scatter-segments-opt-preds-v-test.png" border="0"/>
 </td></tr></table>
 
+We can see from the graph and the results table that our best Ridge Model really improved dramatically after optimization from 52.07% R2 score to 71.07%. In addition, the Average Price across all predictions is a more realistic $30,531.
+
 RESULTS: Optimized Features: Predictions vs Actuals
 <table style="width:100%" align="center"><tr ><td width="100%">
   <img src="images/results_opt_segments.png" border="0"/>
 </td></tr></table>
 
 
+## Model Applications: Segment Analysis
+
+Now that the model has been re-trained, we can validate it using some of the findings from our data investigation where we found different ways to segment the pricing data. We will use our optimized model to predict prices for cars in these segments and see how our model performs. Please note that these new test segments includes cars from both the training and test sets, and we want to use this exercise as examples of interesting application of our Pricing Model.
+
+### Market Defined Segments: Pricing Guidance
+We will now run the Pricing Model against a test set defined on the following market-based classification of our cars:
+
+* Budget: Model Year <= 2016 and Odometer >= 80,000
+* Entry: Model Year between 2016 and 2019, Odometer between 60,000 and 80,000
+* Mid: Model Year between 2020 and 2021, Odometer between 30,000 and 60,000
+* Premium: Model Year newer than 2021, Odometer less than  30,000
+
+This is typical of how used cars are categorized on the dealer lot. Let's see how we do! 
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/scatter-segments-mkt-preds-v-test.png" border="0"/>
+</td></tr></table>
+
+RESULTS: Market-defined Segments: Predictions vs Actuals
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/results_mkt_segments.png" border="0"/>
+</td></tr></table>
+
+As we can see, our model scores fairly well for the first three segments and is able to predict reasonable average prices for each segment. This is an example of using the Pricing Model in **Pricing Guidance** use cases for new inventory, where sales agents can input the vehicle features into the model to get suggested prices.
+
+### Price-based Segments: Sale Price Validation
+
+Next, we define a test set based on the following price-based classification of the cars:
+
+* Low-priced cars: Price < 5,000
+* Mid-priced cars: Prices between 5,000 and 50,000
+* High-priced cars: Price above 50,000
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/scatter-segments-price-preds-v-test.png" border="0"/>
+</td></tr></table>
+
+RESULTS: Price-based Segments: Predictions vs Actuals
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/results_price_segments.png" border="0"/>
+</td></tr></table>
+
+We see that our model performs even better (73.98%) for the mid-priced range than what we have seen so far. For low- and hi-priced cars, there is likely insufficient data to model these cases. This gives us confidence that we can use this model to build a model to classify newly acquired inventory into the market-based segments from the previous Pricing Guidance example.
