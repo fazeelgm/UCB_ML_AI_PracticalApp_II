@@ -198,3 +198,14 @@ I also decided to set the following cutoffs to get a more realistic inventory fo
 </td></tr></table>
 
 Now, we're ready to re-train the model and analyze the results.
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/scatter-segments-opt-preds-v-test.png" border="0"/>
+</td></tr></table>
+
+RESULTS: Optimized Features: Predictions vs Actuals
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/results_opt_segments.png" border="0"/>
+</td></tr></table>
+
+
