@@ -158,8 +158,8 @@ We now use **Feature Importance** to interpret the results of the best performin
 In addition, we also calculate the **Permutation Importance** to measure the change in our model's performace when a feature value is randomly shuffled to see how much the model relies on that feature for its predictions. This will help us determine collinearity between features not captured by the model cofficients and evaluate the impact of changing the feature on the model performance.
 
 <table style="width:100%"><tr>
-  <td width="500%"><img src="images/results_feature_imp.png" border="0"/></td>
-  <td width="500%"><img src="images/results_permutation_imp.png" border="0"/></td>
+  <td width="50%"><img src="images/results_feature_imp.png" border="0"/></td>
+  <td width="50%"><img src="images/results_permutation_imp.png" border="0"/></td>
 </tr></table>
 
 <table style="width:100%" align="center"><tr ><td width="100%">
