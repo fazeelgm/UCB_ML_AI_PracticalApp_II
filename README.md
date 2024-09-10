@@ -108,12 +108,12 @@ In order to find the most suitable model for our data, we used the following pro
   * RobustScaler: Removes the median and uses the interquartile range (IQR) as a reference point for scaling. It is not affected by outliers
 
 RESULTS: Baseline metrics without any optimization (Sorted: max(R2), min(MAE)
-<table style="width:100%" align="center"><tr ><td width="100%">
+<table style="width:100%"><tr ><td width="100%">
   <img src="images/results_baseline_table.png" border="0"/>
 </td></tr></table>
 
 RESULTS: Optimized Model results after hyperparameter tuning and cross-validation (5-fold): Sorted max(R2), min(MAE)
-<table style="width:100%" align="center"><tr ><td width="100%">
+<table style="width:100%"><tr ><td width="100%">
   <img src="images/results_tuned_table.png" border="0"/>
 </td></tr></table>
 
@@ -151,12 +151,15 @@ The graph on the left is showing us that for the high-end, the prediction error 
 
 Taken together, this shows us that we should perhaps use non-linear regresssion methods for this dataset to capture the variation on each end of the price spectrum. However, for the purpose of this study, we're deliberately restricting ourselves to linear regression models to learn more about them.
 
-### Interpreting the Best Model Results: Feature & Permutation Importance
+## Conclusion
+
+### Interpreting the Best Model Results
 
 We now use **Feature Importance** to interpret the results of the best performing model and analyze the coefficients, or weightings, for each feature that were _learnt_ by our model during the training process. This represents the causal relationship between that feature and the price of the vehicle, or the importance of that feature to the price prediction. 
 
 In addition, we also calculate the **Permutation Importance** to measure the change in our model's performace when a feature value is randomly shuffled to see how much the model relies on that feature for its predictions. This will help us determine collinearity between features not captured by the model cofficients and evaluate the impact of changing the feature on the model performance.
 
+RESULTS: Top-10 Feature and Permutation Importance attributes for our model
 <table style="width:100%"><tr>
   <td width="50%"><img src="images/results_feature_imp.png" border="0"/></td>
   <td width="50%"><img src="images/results_permutation_imp.png" border="0"/></td>
@@ -166,62 +169,41 @@ In addition, we also calculate the **Permutation Importance** to measure the cha
   <img src="images/feature_perm_importance.png" border="0"/>
 </td></tr></table>
 
-### Feature Elimination & Optimization
+### What drives the price of a car?
 
-From the feature importance provided by the trained model on the left, we can see the top features that capture upto 85% of the price variation, and individually represent the impact to price when there is a one-unit change in the corresponding feature. For example, our model is aware of the different `condition` values when predicting prices, with `condition_fair` negatively impacting price and `condition_new` positively impacting price.
+From the feature importance provided by the trained model on the left, we can see the top features that individually impact the price when there is a one-unit change in their values. For example, our model is aware of the different `condition` values when predicting prices, with `condition_fair` negatively impacting price while the `condition_new` positively impacts price.
 
-Based on the above side-by-side comparison of the feature and permutation importance, we can see that a majority of the price is determeined by a relatively few features. Taking a look at the features that drive 85% of the price variance, the following features stand out, with different values impacting the price:
+Based on the above side-by-side comparison of the feature and permutation importance, we can see that a majority of the price is determeined by a relatively few features. 
 
-* Odometer
-* Year
-* Condition
-* Transmission
-* Type
-* Drive
-* Fuel
-* Cylinders
-
-Based on the permutation importance, `year` pops to the top of the list. These results are intuitive and make sense from what we consider to be important considerations when pricing a used car.
-
-The other features can be eliminated as they are mostly colinear and detract from the accuracy score.
-
-Interestingly:
-
-* `title_status` was eliminated likely due to the vast majority of the cars having a 'clean' title
-* `size` is likely being over-shadowed by `transmission` and `cylinders` due to colinearity
-
-Let's run the best model again after removing the unnecessary features: `title_status`, `size`.
-
-I also decided to set the following cutoffs to get a more realistic inventory for re-trainig our best model:
-
-* Odometer: Restricted to milage between 0 and 250,000 miles
-  * Removed 232 low milage cars (0.19% of total) and 5,554 high-milage cars (4.53% of total)
-* Year: Removed 2,973 cars (2.42% of total) older than the 1980 model year
+The following features and their attributes drive 85% of the price variance with their impact on the price shown on the x-axis:
 
 <table style="width:100%" align="center"><tr ><td width="100%">
-  <img src="images/year_odo_distribution.png" border="0"/>
+  <img src="images/feature_importance.png" border="0"/>
 </td></tr></table>
 
-Now, we're ready to re-train the model and analyze the results.
+These results are intuitive and make sense from what we consider to be important considerations when pricing a used car. The other features can be eliminated as they are mostly colinear and detract from the accuracy score.
+
+Now, we're ready to re-train the model on the significant features and analyze the results.
 
 <table style="width:100%" align="center"><tr ><td width="100%">
   <img src="images/scatter-segments-opt-preds-v-test.png" border="0"/>
 </td></tr></table>
 
-We can see from the graph and the results table that our best Ridge Model really improved dramatically after optimization from 52.07% R2 score to 71.07%. In addition, the Average Price across all predictions is a more realistic $30,531.
+We can see from the graph and the results table that our best Ridge Model improved dramatically after optimization from 52.07% R2 score to 71.07%. In addition, the Average Price across all predictions is a more realistic $30,531. The base price of $15,870 represents what a car would be priced if no feature attributes were given for the car, and each extra bit of information about the car allows us to predict the price more accurately by capturing over 71% of the variability in the price! 
 
 RESULTS: Optimized Features: Predictions vs Actuals
-<table style="width:100%" align="center"><tr ><td width="100%">
+<table style="width:100%"><tr ><td width="100%">
   <img src="images/results_opt_segments.png" border="0"/>
 </td></tr></table>
 
 
-## Model Applications: Segment Analysis
+## Future Model Applications: Segment Analysis
 
-Now that the model has been re-trained, we can validate it using some of the findings from our data investigation where we found different ways to segment the pricing data. We will use our optimized model to predict prices for cars in these segments and see how our model performs. Please note that these new test segments includes cars from both the training and test sets, and we want to use this exercise as examples of interesting application of our Pricing Model.
+Now that we have an optimized Pricing Model, we can look at some future applications for deployment. During our data investigation, we found different ways to segment the customer data. We will use our retrained model to predict prices for cars in these segments and see how our model performs. Please note that these new test segments includes cars from both the training and test sets, and we want to use this exercise as examples of interesting application of our Pricing Model.
 
 ### Market Defined Segments: Pricing Guidance
-We will now run the Pricing Model against a test set defined on the following market-based classification of our cars:
+
+We will now run the Pricing Model against a test set defined by used car market-defined classification:
 
 * Budget: Model Year <= 2016 and Odometer >= 80,000
 * Entry: Model Year between 2016 and 2019, Odometer between 60,000 and 80,000
@@ -235,13 +217,13 @@ This is typical of how used cars are categorized on the dealer lot. Let's see ho
 </td></tr></table>
 
 RESULTS: Market-defined Segments: Predictions vs Actuals
-<table style="width:100%" align="center"><tr ><td width="100%">
+<table style="width:100%"><tr ><td width="100%">
   <img src="images/results_mkt_segments.png" border="0"/>
 </td></tr></table>
 
-As we can see, our model scores fairly well for the first three segments and is able to predict reasonable average prices for each segment. This is an example of using the Pricing Model in **Pricing Guidance** use cases for new inventory, where sales agents can input the vehicle features into the model to get suggested prices.
+As we can see, our model scores fairly well for the first three segments and is able to predict reasonable average prices for each segment. This is an example of using the Pricing Model for **Pricing Guidance** use cases of new inventory, where sales agents can input the vehicle features into the model to get suggested prices.
 
-### Price-based Segments: Sale Price Validation
+### Price-based Segments: Inventory Classification
 
 Next, we define a test set based on the following price-based classification of the cars:
 
@@ -254,7 +236,7 @@ Next, we define a test set based on the following price-based classification of 
 </td></tr></table>
 
 RESULTS: Price-based Segments: Predictions vs Actuals
-<table style="width:100%" align="center"><tr ><td width="100%">
+<table style="width:100%"><tr ><td width="100%">
   <img src="images/results_price_segments.png" border="0"/>
 </td></tr></table>
 
