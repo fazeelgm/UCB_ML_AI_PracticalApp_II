@@ -11,3 +11,4 @@
 * Counter Overfitting with L1 and L2 Regularization  |  [Link](https://pub.towardsai.net/counter-overfitting-with-l1-and-l2-regularization-f55ecc937300)
 * Data Scaling 101: Standardization and Min-Max Scaling Explained  |  [Link](https://towardsdatascience.com/data-scaling-101-standardization-and-min-max-scaling-explained-60789833e160)
 * Is Multi-Collinearity Destroying Your Causal Inferences In Marketing Mix Modelling?  |  [Link](https://towardsdatascience.com/is-multi-collinearity-destroying-your-causal-inferences-in-marketing-mix-modelling-78cb56017c73)
+  * Future directions: Look at VIF and Bayesian priors based MMM (Mktg Mix Model)
