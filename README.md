@@ -119,16 +119,16 @@ RESULTS: Optimized Model results after hyperparameter tuning and cross-validatio
 
 **Best Model with highest R2 Score: Ridge**
 * Best Params: {'alpha': 100.0, 'random_state': 13}
-* Scaler: StandardScaler
-* R2 Score: 52.07%
-* RMSE: $8,496.24
-* Base Price (y-intercept): $15,690.10
+* Scaler: MinMaxScalar
+* R2 Score: 52.06%
+* RMSE: $8,495.99
+* Base Price (y-intercept): $18,423.72
 
-We see that all the models performed very closely without any clear winners, with **the best R2 score of 52.07% from the tuned Ridge regression model**. Compared to the `DummyRegressor` as our baseline where (R2 = 0) it performed the same as simply predicting the mean of all prices, our tuned Ridge model explains 52% of the variability when predicting the car price from the features, with a standard deviation of $8,496.24 (RMSE: root mean squared error) from the actual price. This is a good start!
+We see that all the models performed very closely without any clear winners, with **the best R2 score of 52.06% from the tuned Ridge regression model**. Compared to the `DummyRegressor` as our baseline where (R2 = 0) it performed the same as simply predicting the mean of all prices, our tuned Ridge model explains 52% of the variability when predicting the car price from the features, with a standard deviation of $8,495.99 (RMSE: root mean squared error) from the actual price. This is a good start!
 
 We can also make the following observations:
 
-* The base price of a car is given by the y-intercept for the linear regression model: $15,690.10
+* The base price of a car is given by the y-intercept for the linear regression model: $18,423.72
 * Each training feature contributes to the predicted price based on the weights for that specific feature that the model has learned from the training data - we will investigate this further later
 
 **_We will use the best performing Ridge model as the basis of our evaluation from this point forward_**.
@@ -175,7 +175,7 @@ From the feature importance provided by the trained model on the left, we can se
 
 Based on the above side-by-side comparison of the feature and permutation importance, we can see that a majority of the price is determeined by a relatively few features. 
 
-The following features and their attributes drive 85% of the price variance with their impact on the price shown on the x-axis:
+The following features and their attributes drive 85% of the price variance with their impact on the price shown on the x-axis, i.e. for any selected feature, we can see how much of an effect (positive or negative) the feature has on the base price:
 
 <table style="width:100%" align="center"><tr ><td width="100%">
   <img src="images/feature_importance.png" border="0"/>
@@ -183,19 +183,18 @@ The following features and their attributes drive 85% of the price variance with
 
 These results are intuitive and make sense from what we consider to be important considerations when pricing a used car. The other features can be eliminated as they are mostly colinear and detract from the accuracy score.
 
-Now, we're ready to re-train the model on the significant features and analyze the results.
+Now, we're ready to re-train the model on the significant features above and analyze the results.
 
 <table style="width:100%" align="center"><tr ><td width="100%">
   <img src="images/scatter-segments-opt-preds-v-test.png" border="0"/>
 </td></tr></table>
 
-We can see from the graph and the results table that our best Ridge Model improved dramatically after optimization from 52.07% R2 score to 71.07%. In addition, the Average Price across all predictions is a more realistic $30,531. The base price of $15,870 represents what a car would be priced if no feature attributes were given for the car, and each extra bit of information about the car allows us to predict the price more accurately by capturing over 71% of the variability in the price! 
+We can see from the graph and the results table that our best Ridge Model improved dramatically after optimization from 52.06% R2 score to 71.09%. In addition, the Average Price across all predictions is a more realistic $25,568. The base price of $9,717 represents what a car would be priced if no feature attributes were given for the car, and each extra bit of information about the car allows us to predict the price more accurately by capturing over 71% of the variability in the price! 
 
 RESULTS: Optimized Features: Predictions vs Actuals
 <table style="width:100%"><tr ><td width="100%">
   <img src="images/results_opt_segments.png" border="0"/>
 </td></tr></table>
-
 
 ## Future Model Applications: Segment Analysis
 
@@ -241,3 +240,23 @@ RESULTS: Price-based Segments: Predictions vs Actuals
 </td></tr></table>
 
 We see that our model performs even better (73.98%) for the mid-priced range than what we have seen so far. For low- and hi-priced cars, there is likely insufficient data to model these cases. This gives us confidence that we can use this model to build a model to classify newly acquired inventory into the market-based segments from the previous Pricing Guidance example.
+
+## Recommendations
+
+Up to this point we have:
+
+* Developed an optimized price prediction model that works well for the mid-priced cars ($5,000-$50,000) in our inventory
+* Shown prices are most impacted by the different combinations of `odometer`, `condition` and `year`
+
+This defines the _sweet spot_ for both pricing guidance and inventory acquisition ability of our work so far:
+
+<table style="width:100%" align="center"><tr ><td width="100%">
+  <img src="images/optimal_model_distributions.png" border="0"/>
+</td></tr></table>
+
+Some concrete recommendations for future considrations:
+
+* Cars with higher mileage should be priced lower, especially when they exceed 100,000 miles, as the data shows a steep decline in price beyond this point
+  * Inventory acquisition should try to drive inventory into the sweet spot range
+* The dealership could focus on acquiring newer vehicles in good condition, as they dictate higher prices
+* Consider increasing prices for cars with low mileage or in like-new condition, as these are highly valued according to the model’s findings. This strategy focuses on the quandrant above the sweet spot and tries to address the considerable inventory
